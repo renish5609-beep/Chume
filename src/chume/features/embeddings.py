@@ -5,9 +5,29 @@ import numpy as np
 S2_13 = ["B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B8A", "B09", "B10", "B11", "B12"]
 
 
+LOCAL_WEIGHTS = {
+    "ResNet50_Weights.SENTINEL2_ALL_MOCO": "data/weights/resnet50_sentinel2_all_moco-df8b932e.pth",
+}
+
+
 def load_encoder(weight_name: str = "ResNet50_Weights.SENTINEL2_ALL_MOCO"):
     import torch
-    from torchgeo.models import get_weight, resnet50, resnet18
+
+    try:
+        from torchgeo.models import get_weight, resnet18, resnet50
+    except ImportError:
+        # torchgeo not installed: load the same published SSL4EO-S12 checkpoint
+        # (downloaded from hf.co/torchgeo) into an identical timm ResNet50.
+        import timm
+
+        model = timm.create_model("resnet50", in_chans=13, num_classes=0)
+        sd = torch.load(LOCAL_WEIGHTS[weight_name], map_location="cpu")
+        sd = {k: v for k, v in sd.items() if not k.startswith("fc.")}
+        missing, unexpected = model.load_state_dict(sd, strict=False)
+        if missing or unexpected:
+            raise RuntimeError(f"weight mismatch: missing={missing} unexpected={unexpected}")
+        model.eval()
+        return model, 13
 
     w = get_weight(weight_name)
     arch = w.meta.get("model", "resnet50")
