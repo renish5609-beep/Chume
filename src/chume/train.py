@@ -43,7 +43,9 @@ def feature_columns(df: pd.DataFrame, cfg: dict) -> list[str]:
             and col not in ("mb_u", "mb_v", "mb_ws")
         ):
             continue
-        if not cfg["features"].get("generic_chip", True) and col.startswith(("g_", "scl_")):
+        if not cfg["features"].get("generic_chip", True) and (
+            col.startswith(("g_", "scl_")) or col == "clear_frac"
+        ):
             continue
         if not cfg["features"].get("embeddings", False) and col.startswith("emb_"):
             continue

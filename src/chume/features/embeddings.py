@@ -76,7 +76,7 @@ def main() -> None:
         batch = []
         for sid in ids[i : i + a.batch]:
             p = find_chip(cfg["paths"]["chip_dir"], sid, cc["pattern"])
-            chip = Chip(load_chip(p), cc["band_order"], cc["scale"], cc["scl_bad"])
+            chip = Chip(load_chip(p), cc["band_order"], cc["scale"], cc["scl_bad"], cc.get("cldprb_bad", 40.0))
             batch.append(to_13(chip.bands))
         Z_g.append(embed_batch(model, batch))
         Z_c.append(embed_batch(model, batch, center_crop=0.5))

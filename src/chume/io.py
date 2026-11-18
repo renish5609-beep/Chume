@@ -27,10 +27,14 @@ def load_chip(path: str) -> np.ndarray:
         arr = z[list(z.keys())[0]]
     elif ext in (".tif", ".tiff"):
         try:
+            import warnings
+
             import rasterio
 
-            with rasterio.open(path) as src:
-                arr = src.read()
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", rasterio.errors.NotGeoreferencedWarning)
+                with rasterio.open(path) as src:
+                    arr = src.read()
         except ImportError:
             import tifffile
 
