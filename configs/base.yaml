@@ -1,0 +1,82 @@
+seed: 42
+paths:
+  raw: data/raw
+  interim: data/interim
+  processed: data/processed
+  runs: outputs/runs
+  train_csv: data/raw/train.csv
+  test_csv: data/raw/test.csv
+  chip_dir: data/raw/chips
+  sample_submission: data/raw/sample_submission.csv
+
+columns:
+  id: sample_id
+  site: site_key
+  targets: [t_ch4, t_no2, t_co, t_aai, t_firms]
+  wind_u: null
+  wind_v: null
+  wind_speed: null
+  wind_dir: null
+  wind_dir_convention: meteorological_from
+  drop: []
+
+chips:
+  pattern: "{id}.*"
+  band_order: [B01, B02, B03, B04, B05, B06, B07, B08, B8A, B09, B11, B12, SCL]
+  scale: 10000.0
+  north_up: true
+  scl_bad: [0, 1, 3, 8, 9, 10]
+
+features:
+  generic_chip: true
+  plume: true
+  plume_random_angle: false
+  plume_radii: [0.10, 0.25, 0.45]
+  plume_half_angle_deg: 30
+  calm_ws: 1.0
+  massbalance: true
+  embeddings: false
+  embeddings_model: ResNet50_Weights.SENTINEL2_ALL_MOCO
+  embeddings_pca: 16
+  site_context: false
+
+cv:
+  n_folds: 5
+  seeds: [42, 7, 2026]
+
+targets:
+  transform: auto
+  candidates: [none, ws_mult, slog]
+
+models:
+  lgbm: true
+  catboost: true
+  n_model_seeds: 3
+  chain: true
+  chain_include_self: false
+  gate: true
+  blend: true
+
+lgbm_params:
+  objective: regression
+  learning_rate: 0.03
+  num_leaves: 31
+  min_data_in_leaf: 40
+  feature_fraction: 0.7
+  bagging_fraction: 0.8
+  bagging_freq: 1
+  lambda_l1: 0.1
+  lambda_l2: 1.0
+  n_estimators: 3000
+  early_stopping_rounds: 150
+  verbose: -1
+
+catboost_params:
+  loss_function: RMSE
+  learning_rate: 0.03
+  depth: 6
+  l2_leaf_reg: 5.0
+  iterations: 3000
+  od_wait: 150
+  verbose: 0
+  allow_writing_files: false

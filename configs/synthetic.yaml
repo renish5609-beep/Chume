@@ -1,0 +1,21 @@
+inherit: base.yaml
+paths:
+  raw: data_syn/raw
+  processed: data_syn/processed
+  runs: outputs_syn/runs
+  train_csv: data_syn/raw/train.csv
+  test_csv: data_syn/raw/test.csv
+  chip_dir: data_syn/raw/chips
+columns:
+  wind_speed: wind_speed
+  wind_dir: wind_dir
+cv:
+  seeds: [42]
+models:
+  n_model_seeds: 1
+lgbm_params:
+  n_estimators: 400
+  learning_rate: 0.05
+catboost_params:
+  iterations: 400
+  learning_rate: 0.08
