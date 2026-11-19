@@ -7,13 +7,20 @@ EPS = 1e-6
 
 class Chip:
     def __init__(
-        self, arr: np.ndarray, band_order: list[str], scale: float = 10000.0, scl_bad=(0, 1, 3, 8, 9, 10)
+        self,
+        arr: np.ndarray,
+        band_order: list[str],
+        scale: float = 10000.0,
+        scl_bad=(0, 1, 3, 8, 9, 10),
+        cldprb_bad: float = 40.0,
     ):
         arr = arr.astype(np.float32)
         self.bands: dict[str, np.ndarray] = {}
         for i, name in enumerate(band_order[: arr.shape[0]]):
             self.bands[name] = arr[i]
         self.scl = self.bands.pop("SCL", None)
+        self.cldprb = self.bands.pop("CLDPRB", None)
+        self.cldprb_bad = cldprb_bad
         for k in list(self.bands):
             b = self.bands[k]
             if scale and np.nanmax(b) > 2.0:
@@ -28,6 +35,8 @@ class Chip:
             m &= np.isfinite(b)
         if self.scl is not None:
             m &= ~np.isin(self.scl.astype(int), list(scl_bad))
+            if self.cldprb is not None:
+                m &= self.cldprb < self.cldprb_bad
         else:
             if "B02" in self.bands and "B04" in self.bands:
                 bright = (self.bands["B02"] + self.bands["B04"]) / 2

@@ -23,11 +23,17 @@ NON_FEATURE_PREFIX = ("_",)
 
 
 def feature_columns(df: pd.DataFrame, cfg: dict) -> list[str]:
+    import re
+
     c = cfg["columns"]
     skip = {c["id"], c["site"], *c["targets"], *c.get("drop", [])}
+    drop_re = [re.compile(r) for r in cfg["features"].get("drop_regex", []) or []]
+    keep_re = [re.compile(r) for r in cfg["features"].get("keep_regex", []) or []]
     cols = []
     for col in df.columns:
         if col in skip or col.startswith(NON_FEATURE_PREFIX):
+            continue
+        if any(r.search(col) for r in drop_re) and not any(r.search(col) for r in keep_re):
             continue
         if not pd.api.types.is_numeric_dtype(df[col]):
             continue
@@ -43,7 +49,9 @@ def feature_columns(df: pd.DataFrame, cfg: dict) -> list[str]:
             and col not in ("mb_u", "mb_v", "mb_ws")
         ):
             continue
-        if not cfg["features"].get("generic_chip", True) and col.startswith(("g_", "scl_")):
+        if not cfg["features"].get("generic_chip", True) and (
+            col.startswith(("g_", "scl_")) or col == "clear_frac"
+        ):
             continue
         if not cfg["features"].get("embeddings", False) and col.startswith("emb_"):
             continue
@@ -151,15 +159,21 @@ def run(cfg: dict, features_path: str, run_id: str) -> dict:
             bo, bt, w = P[:, j0], Pt[:, j0], np.eye(len(names))[j0]
         report["blend_w"][t] = dict(zip(names, map(float, w)))
         if cfg["models"].get("gate", True):
-            go, gws = nested_gate_oof(y, bo, folds)
+            w_max = float(cfg["models"].get("gate_w_max", 1.2))
+            go, gws = nested_gate_oof(y, bo, folds, w_max)
             mu = float(np.nanmean(y))
-            gw = fit_gate(y, bo, mu)
+            gw = fit_gate(y, bo, mu, w_max)
             gt = apply_gate(bt, mu, gw)
             report["gate_w"][t] = {"full": gw, "per_fold": gws}
         else:
             go, gt = bo, bt
         final_oof[t], final_test[t] = go, gt
 
+    if cfg.get("post", {}).get("clip_train_range", False):
+        for t in targets:
+            lo, hi = float(np.nanmin(Y[t])), float(np.nanmax(Y[t]))
+            final_oof[t] = np.clip(final_oof[t].values, lo, hi)
+            final_test[t] = np.clip(final_test[t].values, lo, hi)
     report["final"] = mcrmse(Y, final_oof, targets)
     sub = pd.DataFrame({c["id"]: te[c["id"]].astype(str)})
     for t in targets:

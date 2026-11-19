@@ -1,0 +1,34 @@
+{
+ "features": {
+  "plume": true,
+  "massbalance": true,
+  "generic_chip": true,
+  "drop_regex": [
+   "^(p_|g_|scl_|hot_|tai_|mb_|clear)"
+  ],
+  "keep_regex": [
+   "^(tai_n_pos_all|tai_max|hot_n2\\.0_all|hot_n1\\.5_all|hot_ratio_max|hot_n2\\.0_core|mb_ws|mb_u|mb_v|mb_inv_ws|mb_log_ws|mb_tai_max_per_ws|mb_tai_n_pos_all_per_ws|g_B(0[1-8]|8A|09|11|12)_p50|scl_(4|5|6|10)|p_haze_core_p90|p_r_ch4_norm_du0\\.25|p_r_ch4_norm_duz0\\.25|p_r_ch4_norm_cr0\\.25|p_tai_core_max|p_hot_ratio_core_max|p_haze_du0\\.25|p_b12_du0\\.25|mb_p_r_ch4_norm_du0\\.25_x_ws)$"
+  ]
+ },
+ "columns": {
+  "drop": [
+   "elevation",
+   "slope"
+  ]
+ },
+ "lgbm_params": {
+  "num_leaves": 7,
+  "min_data_in_leaf": 80,
+  "feature_fraction": 0.5,
+  "learning_rate": 0.02
+ },
+ "models": {
+  "catboost": false,
+  "chain": false,
+  "blend": false,
+  "gate": false
+ },
+ "targets": {
+  "transform": "auto"
+ }
+}

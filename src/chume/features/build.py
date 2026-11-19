@@ -25,7 +25,7 @@ def _one(row: pd.Series, cfg: dict) -> dict:
         out["chip_missing"] = 1.0
         return out
     arr = load_chip(path)
-    chip = Chip(arr, cc["band_order"], cc["scale"], cc["scl_bad"])
+    chip = Chip(arr, cc["band_order"], cc["scale"], cc["scl_bad"], cc.get("cldprb_bad", 40.0))
     out["chip_missing"] = 0.0
     if fc.get("generic_chip", True):
         out.update(generic_stats(chip))

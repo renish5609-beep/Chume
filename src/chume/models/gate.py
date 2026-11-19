@@ -22,14 +22,14 @@ def gate_stability(y: np.ndarray, pred: np.ndarray, folds: np.ndarray, mu: float
 
 
 def nested_gate_oof(
-    y: np.ndarray, pred: np.ndarray, folds: np.ndarray
+    y: np.ndarray, pred: np.ndarray, folds: np.ndarray, w_max: float = 1.2
 ) -> tuple[np.ndarray, list[float]]:
     out = np.full_like(pred, np.nan, dtype=float)
     ws = []
     for k in range(int(folds.max()) + 1):
         tr = (folds != k) & ~np.isnan(y)
         mu = float(np.nanmean(y[tr]))
-        w = fit_gate(np.where(tr, y, np.nan), pred, mu)
+        w = fit_gate(np.where(tr, y, np.nan), pred, mu, w_max)
         ws.append(w)
         va = folds == k
         out[va] = apply_gate(pred[va], mu, w)

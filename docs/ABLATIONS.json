@@ -1,0 +1,230 @@
+[
+ [
+  "01 tabular LGBM (29 raw + wind u/v/ws)",
+  0.94137,
+  0.00131,
+  {
+   "t_ch4": 1.01277,
+   "t_no2": 0.98363,
+   "t_co": 0.98775,
+   "t_aai": 0.65169,
+   "t_firms": 1.07102
+  }
+ ],
+ [
+  "02 + generic chip stats",
+  0.93833,
+  0.00167,
+  {
+   "t_ch4": 1.01039,
+   "t_no2": 1.01035,
+   "t_co": 0.98984,
+   "t_aai": 0.65121,
+   "t_firms": 1.02987
+  }
+ ],
+ [
+  "03 + wind-aligned plume (all ~400 feats)",
+  0.94874,
+  0.00119,
+  {
+   "t_ch4": 1.01578,
+   "t_no2": 1.04383,
+   "t_co": 1.00508,
+   "t_aai": 0.67009,
+   "t_firms": 1.00892
+  }
+ ],
+ [
+  "04 plume, RANDOM wind angle (control)",
+  0.94789,
+  0.00107,
+  {
+   "t_ch4": 1.01278,
+   "t_no2": 1.05116,
+   "t_co": 1.00423,
+   "t_aai": 0.66489,
+   "t_firms": 1.00639
+  }
+ ],
+ [
+  "05 + mass balance + transforms (all feats)",
+  0.94104,
+  0.00061,
+  {
+   "t_ch4": 1.00693,
+   "t_no2": 1.01991,
+   "t_co": 1.00298,
+   "t_aai": 0.66769,
+   "t_firms": 1.00767
+  }
+ ],
+ [
+  "06 02-features + skill gate",
+  0.94053,
+  0.00044,
+  {
+   "t_ch4": 1.0168,
+   "t_no2": 1.014,
+   "t_co": 0.996,
+   "t_aai": 0.6568,
+   "t_firms": 1.0191
+  }
+ ],
+ [
+  "07 ... + drop elevation/slope (adversarial pruning)",
+  0.93695,
+  0.00045,
+  {
+   "t_ch4": 1.0165,
+   "t_no2": 1.0068,
+   "t_co": 1.0013,
+   "t_aai": 0.6564,
+   "t_firms": 1.0037
+  }
+ ],
+ [
+  "08 compact physics set (66 feats), regularized",
+  0.92174,
+  0.00106,
+  {
+   "t_ch4": 1.0077,
+   "t_no2": 1.0149,
+   "t_co": 0.9876,
+   "t_aai": 0.6507,
+   "t_firms": 0.9478
+  }
+ ],
+ [
+  "09 compact, RANDOM wind angle (control)",
+  0.92248,
+  0.00125,
+  {
+   "t_ch4": 1.0088,
+   "t_no2": 1.0145,
+   "t_co": 0.9883,
+   "t_aai": 0.6508,
+   "t_firms": 0.95
+  }
+ ],
+ [
+  "10 compact + per-target transforms",
+  0.91403,
+  0.0006,
+  {
+   "t_ch4": 1.0033,
+   "t_no2": 0.9921,
+   "t_co": 0.9879,
+   "t_aai": 0.6503,
+   "t_firms": 0.9365
+  }
+ ],
+ [
+  "11 compact + skill gate",
+  0.92439,
+  0.00036,
+  {
+   "t_ch4": 1.0155,
+   "t_no2": 1.0034,
+   "t_co": 0.9913,
+   "t_aai": 0.6584,
+   "t_firms": 0.9533
+  }
+ ],
+ [
+  "12 compact+transforms, Huber loss",
+  0.91452,
+  0.00098,
+  {
+   "t_ch4": 1.0032,
+   "t_no2": 0.9925,
+   "t_co": 0.989,
+   "t_aai": 0.6506,
+   "t_firms": 0.9373
+  }
+ ],
+ [
+  "13 compact+transforms + SSL4EO-S12 embeddings",
+  0.91817,
+  0.00148,
+  {
+   "t_ch4": 1.009,
+   "t_no2": 0.972,
+   "t_co": 1.0014,
+   "t_aai": 0.6525,
+   "t_firms": 0.9561
+  }
+ ],
+ [
+  "14 + CatBoost, NNLS blend",
+  0.91254,
+  0.00123,
+  {
+   "t_ch4": 0.9994,
+   "t_no2": 0.9911,
+   "t_co": 0.9884,
+   "t_aai": 0.6464,
+   "t_firms": 0.9374
+  }
+ ],
+ [
+  "15 + strict cross-target chain  [Pick A]",
+  0.91252,
+  0.00069,
+  {
+   "t_ch4": 0.998,
+   "t_no2": 0.9984,
+   "t_co": 0.9895,
+   "t_aai": 0.6338,
+   "t_firms": 0.9429
+  }
+ ],
+ [
+  "16 + CatBoost + chain + blend",
+  0.91354,
+  0.00134,
+  {
+   "t_ch4": 0.9991,
+   "t_no2": 1.0031,
+   "t_co": 0.9893,
+   "t_aai": 0.6325,
+   "t_firms": 0.9437
+  }
+ ],
+ [
+  "17 ... chain_include_self",
+  0.9149,
+  0.0025,
+  {
+   "t_ch4": 1.0035,
+   "t_no2": 1.0031,
+   "t_co": 0.9903,
+   "t_aai": 0.6368,
+   "t_firms": 0.9408
+  }
+ ],
+ [
+  "18 full Chume (LGBM+Cat+chain+blend+gate)",
+  0.91871,
+  0.00028,
+  {
+   "t_ch4": 1.0114,
+   "t_no2": 0.9997,
+   "t_co": 0.9925,
+   "t_aai": 0.6367,
+   "t_firms": 0.9532
+  }
+ ],
+ [
+  "19 + gate w<=1.0, LGBM only  [Pick B]",
+  0.91979,
+  8e-05,
+  {
+   "t_ch4": 1.0145,
+   "t_no2": 0.9964,
+   "t_co": 0.9919,
+   "t_aai": 0.6515,
+   "t_firms": 0.9446
+  }
+ ]
+]
