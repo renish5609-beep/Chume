@@ -23,11 +23,17 @@ NON_FEATURE_PREFIX = ("_",)
 
 
 def feature_columns(df: pd.DataFrame, cfg: dict) -> list[str]:
+    import re
+
     c = cfg["columns"]
     skip = {c["id"], c["site"], *c["targets"], *c.get("drop", [])}
+    drop_re = [re.compile(r) for r in cfg["features"].get("drop_regex", []) or []]
+    keep_re = [re.compile(r) for r in cfg["features"].get("keep_regex", []) or []]
     cols = []
     for col in df.columns:
         if col in skip or col.startswith(NON_FEATURE_PREFIX):
+            continue
+        if any(r.search(col) for r in drop_re) and not any(r.search(col) for r in keep_re):
             continue
         if not pd.api.types.is_numeric_dtype(df[col]):
             continue
@@ -162,6 +168,11 @@ def run(cfg: dict, features_path: str, run_id: str) -> dict:
             go, gt = bo, bt
         final_oof[t], final_test[t] = go, gt
 
+    if cfg.get("post", {}).get("clip_train_range", False):
+        for t in targets:
+            lo, hi = float(np.nanmin(Y[t])), float(np.nanmax(Y[t]))
+            final_oof[t] = np.clip(final_oof[t].values, lo, hi)
+            final_test[t] = np.clip(final_test[t].values, lo, hi)
     report["final"] = mcrmse(Y, final_oof, targets)
     sub = pd.DataFrame({c["id"]: te[c["id"]].astype(str)})
     for t in targets:

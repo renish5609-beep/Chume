@@ -40,6 +40,11 @@ features:
   embeddings_model: ResNet50_Weights.SENTINEL2_ALL_MOCO
   embeddings_pca: 16
   site_context: false
+  drop_regex: []
+  keep_regex: []
+
+post:
+  clip_train_range: false
 
 cv:
   n_folds: 5
