@@ -23,18 +23,14 @@
   "learning_rate": 0.02
  },
  "models": {
-  "catboost": true,
+  "catboost": false,
   "chain": false,
-  "blend": true,
-  "gate": false
+  "blend": false,
+  "gate": true,
+  "lgbm": true,
+  "gate_w_max": 1.0
  },
  "targets": {
   "transform": "auto"
- },
- "catboost_params": {
-  "depth": 4,
-  "l2_leaf_reg": 10,
-  "learning_rate": 0.03,
-  "iterations": 2000
  }
 }

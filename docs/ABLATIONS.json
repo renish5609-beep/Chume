@@ -156,7 +156,7 @@
   }
  ],
  [
-  "14 + CatBoost, NNLS blend  [Pick B]",
+  "14 + CatBoost, NNLS blend",
   0.91254,
   0.00123,
   {
@@ -213,6 +213,18 @@
    "t_co": 0.9925,
    "t_aai": 0.6367,
    "t_firms": 0.9532
+  }
+ ],
+ [
+  "19 + gate w<=1.0, LGBM only  [Pick B]",
+  0.91979,
+  8e-05,
+  {
+   "t_ch4": 1.0145,
+   "t_no2": 0.9964,
+   "t_co": 0.9919,
+   "t_aai": 0.6515,
+   "t_firms": 0.9446
   }
  ]
 ]

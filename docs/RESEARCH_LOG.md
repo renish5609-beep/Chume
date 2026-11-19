@@ -85,7 +85,7 @@ All rows: 3 seeds, `python -m chume.experiment` (docs/EXPERIMENTS.md).
 - Huber loss: 0.91452 vs 0.91403. No gain, reverted.
 - SSL4EO-S12 embeddings (+32 PCA dims): 0.91817, worse overall (NO2 improves 0.992 -> 0.972, CO/FIRMS worsen).
   Not kept.
-- + CatBoost (depth 4, l2 10) and NNLS blend: **0.91254 ± 0.00123** (gain 0.0015 > std). Win -> Pick B.
+- + CatBoost (depth 4, l2 10) and NNLS blend: **0.91254 ± 0.00123** (gain 0.0015 > std). Win -> first Pick B (later replaced, see below).
 - + strict chain (LGBM base), blend with LGBM: **0.91252 ± 0.00069**. Win, AAI 0.650 -> 0.634 -> Pick A.
 - LGBM + CatBoost + chain + blend: 0.91354 (3-member NNLS blend overfits slightly). Not better.
 - chain_include_self: 0.91490 ± 0.0025. Worse.
@@ -107,3 +107,23 @@ All rows: 3 seeds, `python -m chume.experiment` (docs/EXPERIMENTS.md).
   computed for test without inferring site membership, which rule 2 forbids. Not built, not used.
 - Kaggle notebook (`notebooks/chume_kaggle.ipynb`) reproduces Pick A's submitted file exactly
   (max abs diff 0.0), 3 min 52 s on 4 CPUs.
+
+## 2026-11-19 — Pick B replaced by a conservative variant
+
+- Old Pick A (chain, 0.91252 ± 0.00069) and old Pick B (CatBoost blend, 0.91254 ± 0.00123) share features,
+  transforms and LightGBM settings; their CV differs by 0.00002 and test predictions correlate 0.92-0.99
+  per target. They are effectively the same model, so B gave little hedge.
+- New Pick B (`configs/final_B.json`): LightGBM only (1 blend member instead of 2) and the skill gate with
+  its weight capped at 1.0 (new config key `models.gate_w_max`). CV **0.91979 ± 0.00008** (CH4 1.0145,
+  NO2 0.9964, CO 0.9919, AAI 0.6515, FIRMS 0.9446). Worse than A by 0.0073 but the most stable model
+  tested. Gate weights (seeds 42/7/2026): CH4 0.03/0.14/0.09 (near-mean prediction), NO2 0.65/0.57/0.67,
+  CO 1.00/0.90/0.70, AAI ~1.0, FIRMS 1.0.
+- Uploaded: public LB **1.13004**, the best public score so far despite worse CV. Consistent with the site
+  shift: shrinking the weakest target (CH4) toward the mean costs little on CV but is safer at new sites.
+  Selection still follows the plan: A = best CV, B = conservative.
+- Adversarial validation re-run on the final 66-feature set: AUC **0.979** (full 447-feature set 0.997).
+  Top drift on the final set: nmdi, scl_6 (water), p_r_ch4_norm_cr0.25, p_hot_ratio_core_max, g_B01_p50.
+
+| Date | Submission | CV (3 seeds) | Public LB |
+|---|---|---|---|
+| 2026-11-19 | Pick B (conservative): LGBM only, gate w <= 1.0, 3-seed avg | 0.91979 | 1.13004 |

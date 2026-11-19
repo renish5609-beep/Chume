@@ -159,9 +159,10 @@ def run(cfg: dict, features_path: str, run_id: str) -> dict:
             bo, bt, w = P[:, j0], Pt[:, j0], np.eye(len(names))[j0]
         report["blend_w"][t] = dict(zip(names, map(float, w)))
         if cfg["models"].get("gate", True):
-            go, gws = nested_gate_oof(y, bo, folds)
+            w_max = float(cfg["models"].get("gate_w_max", 1.2))
+            go, gws = nested_gate_oof(y, bo, folds, w_max)
             mu = float(np.nanmean(y))
-            gw = fit_gate(y, bo, mu)
+            gw = fit_gate(y, bo, mu, w_max)
             gt = apply_gate(bt, mu, gw)
             report["gate_w"][t] = {"full": gw, "per_fold": gws}
         else:

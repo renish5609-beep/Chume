@@ -112,7 +112,8 @@ the full model (seed 42 / 7 / 2026):
 AAI and FIRMS keep their full predictions (w ≈ 1: real skill). CH4 and NO2 are shrunk about halfway,
 meaning weak skill. Nevertheless, the gate **made every model worse** (rows 06, 11 and 18 below). It
 shrinks toward the training mean, but at a new site the error is dominated by a shift of the mean itself,
-so shrinkage throws away site-level signal without removing that bias. The final models do not use it.
+so shrinkage throws away site-level signal without removing that bias. Pick A does not use it; Pick B
+(conservative) uses it with w capped at 1.0, so it can only shrink (row 19).
 
 **Ablations** (`docs/ABLATIONS.md`; site-grouped 5-fold CV, mean ± std over seeds 42, 7, 2026):
 
@@ -131,11 +132,12 @@ so shrinkage throws away site-level signal without removing that bias. The final
 | 11 compact + gate | 0.92439 | 0.00036 | 1.0155 | 1.0034 | 0.9913 | 0.6584 | 0.9533 |
 | 12 10 + Huber loss | 0.91452 | 0.00098 | 1.0032 | 0.9925 | 0.9890 | 0.6506 | 0.9373 |
 | 13 10 + SSL4EO-S12 embeddings | 0.91817 | 0.00148 | 1.0090 | 0.9720 | 1.0014 | 0.6525 | 0.9561 |
-| **14 10 + CatBoost, NNLS blend (Pick B)** | **0.91254** | 0.00123 | 0.9994 | 0.9911 | 0.9884 | 0.6464 | 0.9374 |
+| 14 10 + CatBoost, NNLS blend | 0.91254 | 0.00123 | 0.9994 | 0.9911 | 0.9884 | 0.6464 | 0.9374 |
 | **15 10 + strict chain (Pick A)** | **0.91252** | 0.00069 | 0.9980 | 0.9984 | 0.9895 | 0.6338 | 0.9429 |
 | 16 10 + CatBoost + chain + blend | 0.91354 | 0.00134 | 0.9991 | 1.0031 | 0.9893 | 0.6325 | 0.9437 |
 | 17 16 with chain_include_self | 0.91490 | 0.00250 | 1.0035 | 1.0031 | 0.9903 | 0.6368 | 0.9408 |
 | 18 full Chume (+ gate) | 0.91871 | 0.00028 | 1.0114 | 0.9997 | 0.9925 | 0.6367 | 0.9532 |
+| **19 10 + gate w ≤ 1.0, LGBM only (Pick B)** | **0.91979** | 0.00008 | 1.0145 | 0.9964 | 0.9919 | 0.6515 | 0.9446 |
 
 ![Ablations](figures/ablation.png){width=100%}
 
@@ -162,7 +164,11 @@ averages the test predictions of the three seed runs.
 **Final CV.**
 
 - Pick A: **0.91252 ± 0.00069** (CH4 0.9980, NO2 0.9984, CO 0.9895, AAI 0.6338, FIRMS 0.9429).
-- Pick B: **0.91254 ± 0.00123**.
+- Pick B (conservative: LightGBM only, gate capped at w ≤ 1.0): **0.91979 ± 0.00008**. It gives up 0.007 of
+  CV for the lowest seed-to-seed variance of any model. Its gate sends CH4 almost entirely to the mean
+  (w = 0.03-0.14) and halves NO2 (w ≈ 0.6). An earlier Pick B, a LightGBM + CatBoost blend (row 14,
+  0.91254, public 1.13569), was replaced because it was effectively the same model as Pick A: same
+  features, CV within 0.00002, test predictions correlated 0.92-0.99.
 - Mean predictor: 1.0092.
 
 AAI carries most of the skill. FIRMS improves substantially (0.94 vs 1.005). CH4, NO2 and CO stay close to
@@ -174,12 +180,21 @@ the mean, which is honest: at unseen sites they are barely predictable from thes
 |---|---|---|
 | Baseline 02 (tabular + generic chip stats) | 0.93833 | 1.15504 |
 | Pick A: compact + signed log + strict chain | 0.91252 | 1.14134 |
-| Pick B: compact + signed log + LGBM/CatBoost blend | 0.91254 | 1.13569 |
+| (earlier B) compact + signed log + LGBM/CatBoost blend | 0.91254 | 1.13569 |
+| Pick B: compact + signed log, LGBM only, gate w ≤ 1.0 | 0.91979 | 1.13004 |
 
-CV and the public leaderboard improve together, but the public scores sit about 0.23 higher. The
-organizers anticipate this gap: test facilities and the later time period shift every target relative to
-the training mean. The ordering of A and B on the public split (B better) is within the noise of the public
-subset; we did not select on it.
+CV and the public leaderboard improve together, but the public scores sit about 0.22 higher (0.91 vs
+1.13-1.14). The organizers anticipate this gap: test facilities and the later time period shift every
+target relative to the training mean.
+
+**Why the gap is larger than site-grouped CV predicts.** Site-grouped CV simulates new facilities drawn
+from the training population, but the test set differs as a whole: an adversarial classifier separates
+train from test with AUC 0.997 on all 447 features and still 0.979 on the final 66, driven by moisture and
+surface descriptors (NMDI, SCL water fraction, bare-soil reflectance) and SWIR hot-pixel contrasts, on top
+of a later observation period and higher terrain (mean elevation 461 m vs 173 m). The per-site offsets the
+model learns from 81 training sites therefore transfer only partly, so CV over-states skill at test sites;
+this is also why the conservative Pick B, which shrinks CH4 and NO2 toward the mean, scores best on the
+public split (1.130) despite the worst CV of the three, although we did not select on it.
 
 ![Feature importance (LightGBM gain share), Pick A](figures/importance.png){width=100%}
 
@@ -234,7 +249,7 @@ subset; we did not select on it.
 
 - **Repository:** `src/chume/` is the package. Run `pip install -e ".[dev,geo]"`, then
   `bash scripts/download.sh`, then `bash scripts/run_all.sh`. Configs: `configs/final.json` (Pick A) and
-  `configs/final_B.json` (Pick B). Pinned versions are in `requirements.txt` (Python 3.13). Seeds are
+  `configs/final_B.json` (Pick B, conservative). Pinned versions are in `requirements.txt` (Python 3.13). Seeds are
   42, 7 and 2026.
 - **Hardware:** 4 CPU cores, 15 GB RAM, no GPU.
 - **Runtime:** feature build about 2 min per pass; Pick A about 1 min per seed; full `run_all.sh` about

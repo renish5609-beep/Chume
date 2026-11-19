@@ -17,10 +17,11 @@ Reference: mean predictor under the same grouped CV = **1.0092** (t_ch4 1.015, t
 | 11 compact + skill gate | 0.92439 | 0.00036 | 1.0155 | 1.0034 | 0.9913 | 0.6584 | 0.9533 |
 | 12 compact+transforms, Huber loss | 0.91452 | 0.00098 | 1.0032 | 0.9925 | 0.9890 | 0.6506 | 0.9373 |
 | 13 compact+transforms + SSL4EO-S12 embeddings | 0.91817 | 0.00148 | 1.0090 | 0.9720 | 1.0014 | 0.6525 | 0.9561 |
-| 14 + CatBoost, NNLS blend  [Pick B] | 0.91254 | 0.00123 | 0.9994 | 0.9911 | 0.9884 | 0.6464 | 0.9374 |
+| 14 + CatBoost, NNLS blend | 0.91254 | 0.00123 | 0.9994 | 0.9911 | 0.9884 | 0.6464 | 0.9374 |
 | 15 + strict cross-target chain  [Pick A] | 0.91252 | 0.00069 | 0.9980 | 0.9984 | 0.9895 | 0.6338 | 0.9429 |
 | 16 + CatBoost + chain + blend | 0.91354 | 0.00134 | 0.9991 | 1.0031 | 0.9893 | 0.6325 | 0.9437 |
 | 17 ... chain_include_self | 0.91490 | 0.00250 | 1.0035 | 1.0031 | 0.9903 | 0.6368 | 0.9408 |
 | 18 full Chume (LGBM+Cat+chain+blend+gate) | 0.91871 | 0.00028 | 1.0114 | 0.9997 | 0.9925 | 0.6367 | 0.9532 |
+| 19 10 + gate capped at w ≤ 1.0, LGBM only  [Pick B, conservative] | 0.91979 | 0.00008 | 1.0145 | 0.9964 | 0.9919 | 0.6515 | 0.9446 |
 
-Sources: rows 01-05 from `python -m chume.ablate` (docs/BASELINES.md, docs/ABLATIONS_phase3.md); rows 06-18 from `python -m chume.experiment` (docs/EXPERIMENTS.md). Run-level numbers are in outputs/experiments.jsonl.
+Sources: rows 01-05 from `python -m chume.ablate` (docs/BASELINES.md, docs/ABLATIONS_phase3.md); rows 06-19 from `python -m chume.experiment` (docs/EXPERIMENTS.md). Run-level numbers are in outputs/experiments.jsonl.

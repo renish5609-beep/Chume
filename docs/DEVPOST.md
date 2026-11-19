@@ -22,7 +22,9 @@ site-fingerprint terrain features (adversarial AUC 0.997) helped too.
 random-wind-angle control, and adversarial validation.
 
 **Results:** CV MCRMSE **0.9125** (tabular + chip-stats baseline 0.9383; mean predictor 1.0092).
-Public LB 1.1413 / 1.1357 for the two final picks (baseline 1.1550). Private LB [fill after Nov 28].
+Public LB 1.1413 (Pick A, best CV) / 1.1300 (Pick B, conservative: gated, CV 0.9198) for the two final
+picks (baseline 1.1550). The ~0.22 CV-to-LB gap comes from test sites that differ as a population
+(adversarial AUC 0.98 even on the final features), not only as individual new facilities. Private LB [fill after Nov 28].
 See the research PDF for ablations, figures and limitations.
 
 **Built with:** Python, LightGBM, CatBoost, scikit-learn, SciPy, pandas, rasterio, matplotlib. PyTorch,

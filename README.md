@@ -14,7 +14,8 @@ No competition data, chips or targets are stored in this repo.
 | Mean predictor (same grouped CV) | 1.0092 | |
 | Baseline: tabular + generic chip stats | 0.93833 ± 0.00167 | 1.15504 |
 | **Pick A**: compact physics + signed-log targets + strict chain (`configs/final.json`) | **0.91252 ± 0.00069** | 1.14134 |
-| **Pick B**: compact physics + signed-log targets + LGBM/CatBoost NNLS blend (`configs/final_B.json`) | 0.91254 ± 0.00123 | 1.13569 |
+| **Pick B** (conservative): compact physics + signed-log targets, LightGBM only, skill gate capped at w ≤ 1.0 (`configs/final_B.json`) | 0.91979 ± 0.00008 | 1.13004 |
+| (earlier Pick B, superseded) LGBM/CatBoost NNLS blend (`configs/cat_blend.json`) | 0.91254 ± 0.00123 | 1.13569 |
 
 Full ablation table: `docs/ABLATIONS.md`. Research log: `docs/RESEARCH_LOG.md`. Data notes: `docs/DATA_NOTES.md`.
 Write-up: `docs/WRITEUP.md` / `docs/WRITEUP.pdf`.
@@ -51,7 +52,7 @@ bash scripts/submit.sh outputs/runs/final_A_chain "Pick A"
 
 Each final pick trains with the three CV seeds and averages the three test predictions.
 Runtime on 4 CPU cores / 15 GB RAM, no GPU: feature build ~2 min per pass (4 workers), Pick A ~1 min per
-seed, Pick B ~1.5 min per seed, the full `run_all.sh` about 1 hour (mostly the full-feature ablations 03-05).
+seed, Pick B ~1 min per seed, the full `run_all.sh` about 1 hour (mostly the full-feature ablations 03-05).
 
 Kaggle: `notebooks/chume_kaggle.ipynb` is self-contained (the package source is embedded; generate it with
 `python scripts/make_notebook.py`). It reads `/kaggle/input/obscura`, rebuilds features, trains Pick A over
@@ -64,7 +65,7 @@ predictions, 3 min 52 s end to end on 4 CPUs.
   embeddings, site_context, build), `models/` (gbdt, chain, blend, gate), `train`, `experiment`, `ablate`,
   `adversarial`, `figures`, `recon`, `validate`, `metric`, `cv`.
 - `configs/`: `base.yaml` (real data), `compact.json` (66-feature physics set), `final.json` (Pick A),
-  `final_B.json` (Pick B), `synthetic.yaml`.
+  `final_B.json` (Pick B, conservative), `cat_blend.json` (ablation row 14), `synthetic.yaml`.
 - `docs/`: data notes, research log, ablations, experiments, figures, write-up.
 - `scripts/`: download, run_all, submit, make_notebook, synthetic data generator.
 

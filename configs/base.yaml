@@ -61,6 +61,7 @@ models:
   chain: true
   chain_include_self: false
   gate: true
+  gate_w_max: 1.2
   blend: true
 
 lgbm_params:
